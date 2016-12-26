@@ -1,12 +1,14 @@
 #include <algorithm>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <set>
 #include <vector>
 using namespace std;
 
 const int GRID_ARRAY_SIZE = 12;
-const int NUM_CANDIDATES = 1000;
+const int NUM_CANDIDATES = 10000;
 
 const int DR[] = {-1, 0, 1, 0};
 const int DC[] = {0, 1, 0, -1};
@@ -15,6 +17,7 @@ const char EMPTY = '.';
 int GRID_SIZE, NUM_COLORS;
 
 bool visited[GRID_ARRAY_SIZE][GRID_ARRAY_SIZE];
+set<long long> hashes;
 
 struct grid_state {
     char grid[GRID_ARRAY_SIZE][GRID_ARRAY_SIZE];
@@ -45,13 +48,35 @@ struct grid_state {
         return h;
     }
 
+    void print() const {
+        putchar('\n');
+
+        for (int r = 1; r <= GRID_SIZE; r++) {
+            for (int c = 1; c <= GRID_SIZE; c++) {
+                putchar(grid[r][c]);
+            }
+
+            putchar('\n');
+        }
+
+        putchar('\n');
+    }
+
     void slide_down() {
-        int fill_row = GRID_SIZE, fill_col = 1;
+        int fill_row;
+        int fill_col = 1;
 
         for (int c = 1; c <= GRID_SIZE; c++) {
+            fill_row = GRID_SIZE;
+
             for (int r = GRID_SIZE; r >= 1; r--) {
                 if (grid[r][c] != EMPTY) {
                     grid[fill_row][fill_col] = grid[r][c];
+
+                    if (r != fill_row || c != fill_col) {
+                        grid[r][c] = EMPTY;
+                    }
+
                     fill_row--;
                 }
             }
@@ -96,7 +121,6 @@ struct grid_state {
 
     vector<grid_state> get_neighbors() const {
         vector<grid_state> neighbors;
-        set<long long> hashes;
 
         for (int r = 1; r <= GRID_SIZE; r++) {
             for (int c = 1; c <= GRID_SIZE; c++) {
@@ -125,6 +149,7 @@ struct grid_state {
 };
 
 int main() {
+    int _seed; srand(time(NULL) * (long long) &_seed);
     scanf("%d %d", &GRID_SIZE, &NUM_COLORS);
     grid_state initial_state;
     initial_state.score = 0;
@@ -166,6 +191,7 @@ int main() {
         candidates = new_candidates;
     }
 
+    printf("Succeeds: %d\n", winning_state.is_empty());
     printf("Score: %d\n", winning_state.score);
     puts("Moves:");
 
