@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstdio>
 #include <cstring>
 #include <set>
@@ -8,7 +9,7 @@ const int GRID_ARRAY_SIZE = 12;
 const int NUM_CANDIDATES = 1000;
 
 const int DR[] = {-1, 0, 1, 0};
-const int DC{} = {0, 1, 0, -1};
+const int DC[] = {0, 1, 0, -1};
 const char EMPTY = '.';
 
 int GRID_SIZE, NUM_COLORS;
@@ -72,7 +73,7 @@ struct grid_state {
             int ncol = col + DC[dir];
 
             if (!visited[nrow][ncol] && grid[nrow][ncol] == color) {
-                count += search_and_pop(nrow, ncol);
+                count += search_and_pop(nrow, ncol, color);
             }
         }
 
@@ -116,6 +117,10 @@ struct grid_state {
 
     double heuristic() const {
         return score;
+    }
+
+    bool operator<(const grid_state &other) const {
+        return heuristic() > other.heuristic();
     }
 };
 
