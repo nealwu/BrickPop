@@ -8,7 +8,7 @@
 using namespace std;
 
 const int GRID_ARRAY_SIZE = 12;
-const int NUM_CANDIDATES = 10000;
+const int NUM_CANDIDATES = 1000;
 
 const int DR[] = {-1, 0, 1, 0};
 const int DC[] = {0, 1, 0, -1};
@@ -140,11 +140,34 @@ struct grid_state {
     }
 
     double heuristic() const {
-        return score;
+        int singletons = 0;
+
+        for (int r = 1; r <= GRID_SIZE; r++) {
+            for (int c = 1; c <= GRID_SIZE; c++) {
+                if (grid[r][c] != EMPTY) {
+                    int neighbor_count = 0;
+
+                    for (int dir = 0; dir < 4; dir++) {
+                        int nr = r + DR[dir];
+                        int nc = c + DC[dir];
+
+                        if (grid[nr][nc] == grid[r][c]) {
+                            neighbor_count++;
+                        }
+                    }
+
+                    if (neighbor_count == 0) {
+                        singletons++;
+                    }
+                }
+            }
+        }
+
+        return singletons;
     }
 
     bool operator<(const grid_state &other) const {
-        return heuristic() > other.heuristic();
+        return heuristic() < other.heuristic();
     }
 };
 
