@@ -1,9 +1,9 @@
 var GRID_SIZE = 10;
 var CELL_WIDTH = 80;
-var CIRCLE_FRACTION = 0.8;
+var CIRCLE_FRACTION = 0.9;
 var CIRCLE_RADIUS = CELL_WIDTH * 0.5 * CIRCLE_FRACTION;
 
-var NUM_COLORS = 3;
+var NUM_COLORS = 2;
 var COLORS = ['red', 'yellow', 'green', 'blue', 'purple', 'saddlebrown'];
 var EMPTY = '.';
 
@@ -21,6 +21,20 @@ var visitID = 0;
 
 function updateDisplay(grid) {
   context.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (var i = 0; i <= GRID_SIZE; i++) {
+    context.beginPath();
+    context.moveTo(i * CELL_WIDTH, 0);
+    context.lineTo(i * CELL_WIDTH, canvas.height);
+    context.stroke();
+    context.closePath();
+
+    context.beginPath();
+    context.moveTo(0, i * CELL_WIDTH);
+    context.lineTo(canvas.width, i * CELL_WIDTH);
+    context.stroke();
+    context.closePath();
+  }
 
   for (var r = 1; r <= GRID_SIZE; r++) {
     for (var c = 1; c <= GRID_SIZE; c++) {
@@ -101,6 +115,10 @@ canvas.addEventListener('click', function(e) {
 
   var row = Math.floor(y / CELL_WIDTH) + 1;
   var col = Math.floor(x / CELL_WIDTH) + 1;
+
+  if (grid[row][col] === EMPTY) {
+    return;
+  }
 
   var centerX = (col - 0.5) * CELL_WIDTH;
   var centerY = (row - 0.5) * CELL_WIDTH;
