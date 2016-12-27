@@ -1,0 +1,9 @@
+body {
+  font-family: Helvetica, Arial, Sans-Serif;
+}
+
+.history-button {
+  width: 400px;
+  height: 50px;
+  font-size: 40px;
+}

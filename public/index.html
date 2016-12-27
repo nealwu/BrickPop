@@ -3,15 +3,14 @@
 <html>
   <head>
     <title>Brick Pop solver</title>
-    <style>
-      body {
-        font-family: Helvetica, Arial, Sans-Serif;
-      }
-    </style>
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div>Score: <span id="score">0</span></div>
+    <h1>Score: <span id="score">0</span></h1>
     <canvas></canvas>
+    <br>
+    <input id="back-button" class="history-button" type="button" value="<" />
+    <input id="forward-button" class="history-button" type="button" value=">" />
     <script src="client.js"></script>
   </body>
 </html>

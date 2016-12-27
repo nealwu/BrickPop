@@ -16,8 +16,27 @@ canvas.width = GRID_SIZE * CELL_WIDTH;
 canvas.height = GRID_SIZE * CELL_WIDTH;
 
 var grid = [];
+var history = [];
+var historyPosition = 0;
+var historyLimit = 0;
 var visited = [];
 var visitID = 0;
+
+function copy2D(input) {
+  var result = [];
+
+  for (var i = 0; i < input.length; i++) {
+    var row = [];
+
+    for (var j = 0; j < input[i].length; j++) {
+      row.push(input[i][j]);
+    }
+
+    result.push(row);
+  }
+
+  return result;
+}
 
 function updateDisplay(grid) {
   context.clearRect(0, 0, canvas.width, canvas.height);
@@ -149,7 +168,30 @@ canvas.addEventListener('click', function(e) {
 
   slideDown(grid);
   updateDisplay(grid);
+  history[historyPosition++] = copy2D(grid);
+  historyLimit = historyPosition;
+  console.log(history);
 }, false);
+
+document.getElementById('back-button').onclick = function() {
+  if (historyPosition <= 1) {
+    return;
+  }
+
+  historyPosition--;
+  grid = copy2D(history[historyPosition - 1]);
+  updateDisplay(grid);
+};
+
+document.getElementById('forward-button').onclick = function() {
+  if (historyPosition >= historyLimit) {
+    return;
+  }
+
+  historyPosition++;
+  grid = copy2D(history[historyPosition - 1]);
+  updateDisplay(grid);
+};
 
 for (var r = 1; r <= GRID_SIZE; r++) {
   for (var c = 1; c <= GRID_SIZE; c++) {
@@ -160,3 +202,5 @@ for (var r = 1; r <= GRID_SIZE; r++) {
 
 slideDown(grid);
 updateDisplay(grid);
+history[historyPosition++] = copy2D(grid);
+historyLimit = historyPosition;
