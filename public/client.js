@@ -1,21 +1,36 @@
 var GRID_SIZE = 10;
 var CELL_WIDTH = 80;
 var CIRCLE_FRACTION = 0.8;
+var CIRCLE_RADIUS = CELL_WIDTH * 0.5 * CIRCLE_FRACTION;
 
+var NUM_COLORS = 3;
 var COLORS = ['red', 'yellow', 'green', 'blue', 'purple', 'saddlebrown'];
 var EMPTY = '.';
 
+var DR = [-1, 0, 1, 0];
+var DC = [0, 1, 0, -1];
+
 var canvas = document.querySelector('canvas');
+var context = canvas.getContext('2d');
 canvas.width = GRID_SIZE * CELL_WIDTH;
 canvas.height = GRID_SIZE * CELL_WIDTH;
-var context = canvas.getContext('2d');
+
+var grid = [];
+var visited = [];
+var visitID = 0;
 
 function updateDisplay(grid) {
+  context.clearRect(0, 0, canvas.width, canvas.height);
+
   for (var r = 1; r <= GRID_SIZE; r++) {
     for (var c = 1; c <= GRID_SIZE; c++) {
+      if (grid[r][c] === EMPTY) {
+	continue;
+      }
+
       context.beginPath();
-      context.arc(CELL_WIDTH * (c - 0.5), CELL_WIDTH * (r - 0.5), CELL_WIDTH * 0.5 * CIRCLE_FRACTION, 0, 2 * Math.PI, false);
-      context.fillStyle = grid[r][c] === EMPTY ? 'white' : COLORS[grid[r][c] - '0'];
+      context.arc(CELL_WIDTH * (c - 0.5), CELL_WIDTH * (r - 0.5), CIRCLE_RADIUS, 0, 2 * Math.PI);
+      context.fillStyle = COLORS[grid[r][c] - '0'];
       context.fill();
       context.closePath();
     }
@@ -30,10 +45,10 @@ function slideDown(grid) {
     fill_row = GRID_SIZE;
 
     for (var r = GRID_SIZE; r >= 1; r--) {
-      if (grid[r][c] != EMPTY) {
+      if (grid[r][c] !== EMPTY) {
         grid[fill_row][fill_col] = grid[r][c];
 
-        if (r != fill_row || c != fill_col) {
+        if (r !== fill_row || c !== fill_col) {
           grid[r][c] = EMPTY;
         }
 
@@ -47,29 +62,83 @@ function slideDown(grid) {
   }
 }
 
-var grid = [];
-
+// Construct arrays
 for (var r = 0; r <= GRID_SIZE + 1; r++) {
-  var row = [];
+  var gridRow = [];
+  var visitedRow = [];
 
   for (var c = 0; c <= GRID_SIZE + 1; c++) {
-    row.push(EMPTY);
+    gridRow.push(EMPTY);
+    visitedRow.push(0);
   }
 
-  grid.push(row);
+  grid.push(gridRow);
+  visited.push(visitedRow);
 }
 
-window.setInterval(function() {
-  var r = Math.floor(Math.random() * GRID_SIZE + 1);
-  var c = Math.floor(Math.random() * GRID_SIZE + 1);
-  var color = Math.floor(Math.random() * (COLORS.length + 1));
+function searchAndPop(row, col, color) {
+  visited[row][col] = visitID;
+  grid[row][col] = EMPTY;
 
-  if (color < COLORS.length) {
-    grid[r][c] = String.fromCharCode(color + '0'.charCodeAt(0));
-  } else {
-    grid[r][c] = EMPTY;
+  var count = 1;
+
+  for (var dir = 0; dir < 4; dir++) {
+    var nrow = row + DR[dir];
+    var ncol = col + DC[dir];
+
+    if (visited[nrow][ncol] !== visitID && grid[nrow][ncol] === color) {
+      count += searchAndPop(nrow, ncol, color);
+    }
   }
+
+  return count;
+}
+
+canvas.addEventListener('click', function(e) {
+  var rect = canvas.getBoundingClientRect();
+  var x = e.pageX - rect.left;
+  var y = e.pageY - rect.top;
+
+  var row = Math.floor(y / CELL_WIDTH) + 1;
+  var col = Math.floor(x / CELL_WIDTH) + 1;
+
+  var centerX = (col - 0.5) * CELL_WIDTH;
+  var centerY = (row - 0.5) * CELL_WIDTH;
+  var squaredDistance = (x - centerX) * (x - centerX) + (y - centerY) * (y - centerY);
+
+  if (squaredDistance > CIRCLE_RADIUS * CIRCLE_RADIUS) {
+    return;
+  }
+
+  console.log(row + ' ' + col);
+
+  visitID++;
+  var color = grid[row][col];
+  var popped = searchAndPop(row, col, color);
+
+  if (popped === 1) {
+    grid[row][col] = color;
+    return;
+  }
+
+  console.log('Popped ' + popped);
+
+  var scoreElem = document.getElementById('score');
+  var score = parseInt(scoreElem.firstChild.nodeValue);
+  score += popped * (popped - 1);
+  scoreElem.removeChild(scoreElem.firstChild);
+  scoreElem.appendChild(document.createTextNode(score));
 
   slideDown(grid);
   updateDisplay(grid);
-}, 50);
+}, false);
+
+for (var r = 1; r <= GRID_SIZE; r++) {
+  for (var c = 1; c <= GRID_SIZE; c++) {
+    var color = Math.floor(Math.random() * NUM_COLORS);
+    grid[r][c] = String.fromCharCode(color + '0'.charCodeAt(0));
+  }
+}
+
+slideDown(grid);
+updateDisplay(grid);
