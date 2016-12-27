@@ -22,6 +22,7 @@ var historyLimit = 0;
 var visited = [];
 var visitID = 0;
 
+// Performs a deep copy of a 2D array of primitives
 function copy2D(input) {
   var result = [];
 
@@ -38,9 +39,21 @@ function copy2D(input) {
   return result;
 }
 
+function getScore() {
+  var scoreElem = document.getElementById('score');
+  return parseInt(scoreElem.firstChild.nodeValue);
+}
+
+function updateScore(score) {
+  var scoreElem = document.getElementById('score');
+  scoreElem.removeChild(scoreElem.firstChild);
+  scoreElem.appendChild(document.createTextNode(score));
+}
+
 function updateDisplay(grid) {
   context.clearRect(0, 0, canvas.width, canvas.height);
 
+  // Start by drawing out a grid
   for (var i = 0; i <= GRID_SIZE; i++) {
     context.beginPath();
     context.moveTo(i * CELL_WIDTH, 0);
@@ -61,6 +74,7 @@ function updateDisplay(grid) {
 	continue;
       }
 
+      // Draw a colored circle
       context.beginPath();
       context.arc(CELL_WIDTH * (c - 0.5), CELL_WIDTH * (r - 0.5), CIRCLE_RADIUS, 0, 2 * Math.PI);
       context.fillStyle = COLORS[grid[r][c] - '0'];
@@ -93,6 +107,13 @@ function slideDown(grid) {
       fill_col++;
     }
   }
+}
+
+function displayAndSave() {
+  slideDown(grid);
+  updateDisplay(grid);
+  history[historyPosition++] = [copy2D(grid), getScore()];
+  historyLimit = historyPosition;
 }
 
 // Construct arrays
@@ -160,18 +181,18 @@ canvas.addEventListener('click', function(e) {
 
   console.log('Popped ' + popped);
 
-  var scoreElem = document.getElementById('score');
-  var score = parseInt(scoreElem.firstChild.nodeValue);
-  score += popped * (popped - 1);
-  scoreElem.removeChild(scoreElem.firstChild);
-  scoreElem.appendChild(document.createTextNode(score));
-
-  slideDown(grid);
-  updateDisplay(grid);
-  history[historyPosition++] = copy2D(grid);
-  historyLimit = historyPosition;
+  var score = getScore() + popped * (popped - 1);
+  updateScore(score);
+  displayAndSave();
   console.log(history);
 }, false);
+
+function loadHistory(position) {
+  var data = history[position];
+  grid = copy2D(data[0]);
+  updateDisplay(grid);
+  updateScore(data[1]);
+}
 
 document.getElementById('back-button').onclick = function() {
   if (historyPosition <= 1) {
@@ -179,8 +200,7 @@ document.getElementById('back-button').onclick = function() {
   }
 
   historyPosition--;
-  grid = copy2D(history[historyPosition - 1]);
-  updateDisplay(grid);
+  loadHistory(historyPosition - 1);
 };
 
 document.getElementById('forward-button').onclick = function() {
@@ -189,8 +209,7 @@ document.getElementById('forward-button').onclick = function() {
   }
 
   historyPosition++;
-  grid = copy2D(history[historyPosition - 1]);
-  updateDisplay(grid);
+  loadHistory(historyPosition - 1);
 };
 
 for (var r = 1; r <= GRID_SIZE; r++) {
@@ -200,7 +219,4 @@ for (var r = 1; r <= GRID_SIZE; r++) {
   }
 }
 
-slideDown(grid);
-updateDisplay(grid);
-history[historyPosition++] = copy2D(grid);
-historyLimit = historyPosition;
+displayAndSave();
