@@ -109,7 +109,7 @@ function slideDown(grid) {
   }
 }
 
-function displayAndSave() {
+function displayChangesAndSave() {
   slideDown(grid);
   updateDisplay(grid);
   history[historyPosition++] = [copy2D(grid), getScore()];
@@ -148,27 +148,12 @@ function searchAndPop(row, col, color) {
   return count;
 }
 
-canvas.addEventListener('click', function(e) {
-  var rect = canvas.getBoundingClientRect();
-  var x = e.pageX - rect.left;
-  var y = e.pageY - rect.top;
-
-  var row = Math.floor(y / CELL_WIDTH) + 1;
-  var col = Math.floor(x / CELL_WIDTH) + 1;
+function playerMove(row, col) {
+  console.log('playerMove: ' + row + ' ' + col);
 
   if (grid[row][col] === EMPTY) {
     return;
   }
-
-  var centerX = (col - 0.5) * CELL_WIDTH;
-  var centerY = (row - 0.5) * CELL_WIDTH;
-  var squaredDistance = (x - centerX) * (x - centerX) + (y - centerY) * (y - centerY);
-
-  if (squaredDistance > CIRCLE_RADIUS * CIRCLE_RADIUS) {
-    return;
-  }
-
-  console.log(row + ' ' + col);
 
   visitID++;
   var color = grid[row][col];
@@ -183,8 +168,27 @@ canvas.addEventListener('click', function(e) {
 
   var score = getScore() + popped * (popped - 1);
   updateScore(score);
-  displayAndSave();
+  displayChangesAndSave();
   console.log(history);
+}
+
+canvas.addEventListener('click', function(e) {
+  var rect = canvas.getBoundingClientRect();
+  var x = e.pageX - rect.left;
+  var y = e.pageY - rect.top;
+
+  var row = Math.floor(y / CELL_WIDTH) + 1;
+  var col = Math.floor(x / CELL_WIDTH) + 1;
+
+  var centerX = (col - 0.5) * CELL_WIDTH;
+  var centerY = (row - 0.5) * CELL_WIDTH;
+  var squaredDistance = (x - centerX) * (x - centerX) + (y - centerY) * (y - centerY);
+
+  if (squaredDistance > CIRCLE_RADIUS * CIRCLE_RADIUS) {
+    return;
+  }
+
+  playerMove(row, col);
 }, false);
 
 function loadHistory(position) {
@@ -219,4 +223,4 @@ for (var r = 1; r <= GRID_SIZE; r++) {
   }
 }
 
-displayAndSave();
+displayChangesAndSave();
