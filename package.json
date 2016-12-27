@@ -1,0 +1,24 @@
+{
+  "name": "brickpop",
+  "version": "1.0.0",
+  "description": "Brick Pop solver",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nealwu/BrickPop.git"
+  },
+  "author": "Neal Wu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nealwu/BrickPop/issues"
+  },
+  "homepage": "https://github.com/nealwu/BrickPop#readme",
+  "dependencies": {
+    "express": "^4.14.0",
+    "nodemon": "^1.11.0"
+  }
+}
