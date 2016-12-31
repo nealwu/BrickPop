@@ -16,7 +16,8 @@ const char EMPTY = '.';
 
 int GRID_SIZE, NUM_COLORS;
 
-bool visited[GRID_ARRAY_SIZE][GRID_ARRAY_SIZE];
+int visited_id = 0;
+int visited[GRID_ARRAY_SIZE][GRID_ARRAY_SIZE];
 set<long long> hashes;
 
 struct grid_state {
@@ -88,7 +89,7 @@ struct grid_state {
     }
 
     int search_and_pop(int row, int col, char color) {
-        visited[row][col] = true;
+        visited[row][col] = visited_id;
         grid[row][col] = EMPTY;
 
         int count = 1;
@@ -97,7 +98,7 @@ struct grid_state {
             int nrow = row + DR[dir];
             int ncol = col + DC[dir];
 
-            if (!visited[nrow][ncol] && grid[nrow][ncol] == color) {
+            if (visited[nrow][ncol] != visited_id && grid[nrow][ncol] == color) {
                 count += search_and_pop(nrow, ncol, color);
             }
         }
@@ -106,7 +107,7 @@ struct grid_state {
     }
 
     bool pop(int row, int col) {
-        memset(visited, false, sizeof(visited));
+	visited_id++;
         int popped = search_and_pop(row, col, grid[row][col]);
 
         if (popped <= 1) {
@@ -137,6 +138,10 @@ struct grid_state {
         }
 
         return neighbors;
+    }
+
+    int estimated_finish_score() const {
+
     }
 
     double heuristic() const {

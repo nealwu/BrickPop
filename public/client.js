@@ -15,13 +15,6 @@ var context = canvas.getContext('2d');
 canvas.width = GRID_SIZE * CELL_WIDTH;
 canvas.height = GRID_SIZE * CELL_WIDTH;
 
-var grid = [];
-var history = [];
-var historyPosition = 0;
-var historyLimit = 0;
-var visited = [];
-var visitID = 0;
-
 // Performs a deep copy of a 2D array of primitives
 function copy2D(input) {
   var result = [];
@@ -106,6 +99,25 @@ function slideDown(grid) {
     if (fill_row < GRID_SIZE) {
       fill_col++;
     }
+  }
+}
+
+var grid = [];
+var history = [];
+var historyPosition = 0;
+var historyLimit = 0;
+var visited = [];
+var visitID = 0;
+
+function printGrid() {
+  for (var r = 1; r <= GRID_SIZE; r++) {
+    var row = '';
+
+    for (var c = 1; c <= GRID_SIZE; c++) {
+      row += grid[r][c];
+    }
+
+    console.log(row);
   }
 }
 
