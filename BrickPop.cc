@@ -3,12 +3,12 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
-#include <set>
+#include <map>
 #include <vector>
 using namespace std;
 
 const int GRID_ARRAY_SIZE = 12;
-const int NUM_CANDIDATES = 1000;
+const int NUM_CANDIDATES = 1000000;
 
 const int DR[] = {-1, 0, 1, 0};
 const int DC[] = {0, 1, 0, -1};
@@ -18,7 +18,7 @@ int GRID_SIZE, NUM_COLORS;
 
 int visited_id = 0;
 int visited[GRID_ARRAY_SIZE][GRID_ARRAY_SIZE];
-set<long long> hashes;
+map<long long, int> hashes;
 
 struct grid_state {
     char grid[GRID_ARRAY_SIZE][GRID_ARRAY_SIZE];
@@ -107,7 +107,7 @@ struct grid_state {
     }
 
     bool pop(int row, int col) {
-	visited_id++;
+        visited_id++;
         int popped = search_and_pop(row, col, grid[row][col]);
 
         if (popped <= 1) {
@@ -129,7 +129,10 @@ struct grid_state {
                     grid_state neighbor = *this;
 
                     if (neighbor.pop(r, c)) {
-                        if (hashes.insert(neighbor.hash()).second) {
+                        long long h = neighbor.hash();
+
+                        if (neighbor.score > hashes[h]) {
+                            hashes[h] = neighbor.score;
                             neighbors.push_back(neighbor);
                         }
                     }
@@ -199,6 +202,10 @@ int main() {
 
         for (int i = 0; i < (int) candidates.size(); i++) {
             grid_state candidate = candidates[i];
+
+            if (candidate.score < hashes[candidate.hash()]) {
+                continue;
+            }
 
             if (make_pair(candidate.is_empty(), candidate.score) >
                 make_pair(winning_state.is_empty(), winning_state.score)) {
