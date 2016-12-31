@@ -3,7 +3,7 @@ var CELL_WIDTH = 80;
 var CIRCLE_FRACTION = 0.9;
 var CIRCLE_RADIUS = CELL_WIDTH * 0.5 * CIRCLE_FRACTION;
 
-var NUM_COLORS = 2;
+var NUM_COLORS = 4;
 var COLORS = ['red', 'yellow', 'green', 'blue', 'purple', 'saddlebrown'];
 var EMPTY = '.';
 

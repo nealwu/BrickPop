@@ -8,7 +8,7 @@
 using namespace std;
 
 const int GRID_ARRAY_SIZE = 12;
-const int NUM_CANDIDATES = 1000000;
+const int NUM_CANDIDATES = 10000;
 
 const int DR[] = {-1, 0, 1, 0};
 const int DC[] = {0, 1, 0, -1};
@@ -198,6 +198,7 @@ int main() {
     candidates.push_back(initial_state);
 
     while (!candidates.empty()) {
+        printf("%d candidates\n", (int) candidates.size());
         vector<grid_state> new_candidates;
 
         for (int i = 0; i < (int) candidates.size(); i++) {
