@@ -146,7 +146,7 @@ struct grid_state {
         return neighbors;
     }
 
-    int estimated_score_to_finish() const {
+    int estimated_score_to_finish() {
         visited_id++;
         int total = 0;
 
@@ -162,7 +162,7 @@ struct grid_state {
         return total;
     }
 
-    double heuristic() const {
+    double heuristic() {
         int singletons = 0;
 
         for (int r = 1; r <= GRID_SIZE; r++) {
@@ -190,7 +190,7 @@ struct grid_state {
         return -10000.0 * singletons + estimated_score;
     }
 
-    bool operator<(const grid_state &other) const {
+    bool operator<(grid_state &other) {
         return heuristic() > other.heuristic();
     }
 };
