@@ -190,7 +190,7 @@ struct grid_state {
         return -10000.0 * singletons + estimated_score;
     }
 
-    bool operator<(grid_state &other) {
+    bool operator <(grid_state &other) {
         return heuristic() > other.heuristic();
     }
 };
