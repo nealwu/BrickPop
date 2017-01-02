@@ -88,9 +88,12 @@ struct grid_state {
         }
     }
 
-    int search_and_pop(int row, int col, char color) {
+    int search_and_pop(int row, int col, char color, bool write_grid) {
         visited[row][col] = visited_id;
-        grid[row][col] = EMPTY;
+
+        if (write_grid) {
+            grid[row][col] = EMPTY;
+        }
 
         int count = 1;
 
@@ -99,7 +102,7 @@ struct grid_state {
             int ncol = col + DC[dir];
 
             if (visited[nrow][ncol] != visited_id && grid[nrow][ncol] == color) {
-                count += search_and_pop(nrow, ncol, color);
+                count += search_and_pop(nrow, ncol, color, write_grid);
             }
         }
 
@@ -108,7 +111,7 @@ struct grid_state {
 
     bool pop(int row, int col) {
         visited_id++;
-        int popped = search_and_pop(row, col, grid[row][col]);
+        int popped = search_and_pop(row, col, grid[row][col], true);
 
         if (popped <= 1) {
             return false;
@@ -143,8 +146,20 @@ struct grid_state {
         return neighbors;
     }
 
-    int estimated_finish_score() const {
+    int estimated_score_to_finish() const {
+        visited_id++;
+        int total = 0;
 
+        for (int r = 1; r <= GRID_SIZE; r++) {
+            for (int c = 1; c <= GRID_SIZE; c++) {
+                if (grid[r][c] != EMPTY && visited[r][c] != visited_id) {
+                    int popped = search_and_pop(r, c, grid[r][c], false);
+                    total += popped * (popped - 1);
+                }
+            }
+        }
+
+        return total;
     }
 
     double heuristic() const {
@@ -171,11 +186,12 @@ struct grid_state {
             }
         }
 
-        return singletons;
+        int estimated_score = score + estimated_score_to_finish();
+        return -10000.0 * singletons + estimated_score;
     }
 
     bool operator<(const grid_state &other) const {
-        return heuristic() < other.heuristic();
+        return heuristic() > other.heuristic();
     }
 };
 
