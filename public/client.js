@@ -1,7 +1,9 @@
 var GRID_SIZE = 10;
-var CELL_WIDTH = 80;
+var CELL_DIM = 80;
+var GRID_DIM = GRID_SIZE * CELL_DIM;
 var CIRCLE_FRACTION = 0.9;
-var CIRCLE_RADIUS = CELL_WIDTH * 0.5 * CIRCLE_FRACTION;
+var CIRCLE_RADIUS = CELL_DIM * 0.5 * CIRCLE_FRACTION;
+var PALETTE_GAP = 0.5 * CELL_DIM;
 
 var NUM_COLORS = 6;
 var COLORS = ['red', 'yellow', 'green', 'blue', 'purple', 'saddlebrown'];
@@ -12,8 +14,12 @@ var DC = [0, 1, 0, -1];
 
 var canvas = document.querySelector('canvas');
 var context = canvas.getContext('2d');
-canvas.width = GRID_SIZE * CELL_WIDTH;
-canvas.height = GRID_SIZE * CELL_WIDTH;
+
+var paintColor = NUM_COLORS + 1;
+
+// Set up an extra column for the painting palette
+canvas.width = (GRID_SIZE + 1) * CELL_DIM + PALETTE_GAP;
+canvas.height = Math.max(GRID_SIZE, NUM_COLORS + 2) * CELL_DIM;
 
 // Performs a deep copy of a 2D array of primitives
 function copy2D(input) {
@@ -48,15 +54,17 @@ function updateDisplay(grid) {
 
   // Start by drawing out a grid
   for (var i = 0; i <= GRID_SIZE; i++) {
+    context.lineWidth = 1;
+
     context.beginPath();
-    context.moveTo(i * CELL_WIDTH, 0);
-    context.lineTo(i * CELL_WIDTH, canvas.height);
+    context.moveTo(i * CELL_DIM, 0);
+    context.lineTo(i * CELL_DIM, GRID_DIM);
     context.stroke();
     context.closePath();
 
     context.beginPath();
-    context.moveTo(0, i * CELL_WIDTH);
-    context.lineTo(canvas.width, i * CELL_WIDTH);
+    context.moveTo(0, i * CELL_DIM);
+    context.lineTo(GRID_DIM, i * CELL_DIM);
     context.stroke();
     context.closePath();
   }
@@ -69,9 +77,37 @@ function updateDisplay(grid) {
 
       // Draw a colored circle
       context.beginPath();
-      context.arc(CELL_WIDTH * (c - 0.5), CELL_WIDTH * (r - 0.5), CIRCLE_RADIUS, 0, 2 * Math.PI);
+      context.arc(CELL_DIM * (c - 0.5), CELL_DIM * (r - 0.5), CIRCLE_RADIUS, 0, 2 * Math.PI);
       context.fillStyle = COLORS[grid[r][c] - '0'];
       context.fill();
+      context.closePath();
+    }
+  }
+
+  // Draw the palette
+  for (var i = 0; i <= NUM_COLORS + 1; i++) {
+    var x = GRID_SIZE * CELL_DIM + PALETTE_GAP;
+    var y = i * CELL_DIM;
+    context.beginPath();
+    context.rect(x, y, CELL_DIM, CELL_DIM);
+    context.fillStyle = i < NUM_COLORS ? COLORS[i] : 'white';
+    context.fill();
+    context.lineWidth = 1;
+    context.strokeStyle = 'black';
+    context.stroke();
+    context.closePath();
+
+    if (i === NUM_COLORS + 1) {
+      // Draw an X which represents exiting out of the palette
+      var adjust = CELL_DIM * 0.15;
+      context.beginPath();
+      context.lineWidth = 4;
+      context.moveTo(x + adjust, y + adjust);
+      context.lineTo(x + CELL_DIM - adjust, y + CELL_DIM - adjust);
+      context.stroke();
+      context.moveTo(x + CELL_DIM - adjust, y + adjust);
+      context.lineTo(x + adjust, y + CELL_DIM - adjust);
+      context.stroke();
       context.closePath();
     }
   }
@@ -189,18 +225,36 @@ canvas.addEventListener('click', function(e) {
   var x = e.pageX - rect.left;
   var y = e.pageY - rect.top;
 
-  var row = Math.floor(y / CELL_WIDTH) + 1;
-  var col = Math.floor(x / CELL_WIDTH) + 1;
+  var row = Math.floor(y / CELL_DIM) + 1;
+  var col = Math.floor(x / CELL_DIM) + 1;
 
-  var centerX = (col - 0.5) * CELL_WIDTH;
-  var centerY = (row - 0.5) * CELL_WIDTH;
+  // Detect clicks on the palette
+  if (x > GRID_DIM) {
+    if (x >= GRID_DIM + PALETTE_GAP && x <= GRID_DIM + PALETTE_GAP + CELL_DIM) {
+      var index = row - 1;
+
+      if (index <= NUM_COLORS + 1) {
+	paintColor = index;
+      }
+    }
+
+    return;
+  }
+
+  var centerX = (col - 0.5) * CELL_DIM;
+  var centerY = (row - 0.5) * CELL_DIM;
   var squaredDistance = (x - centerX) * (x - centerX) + (y - centerY) * (y - centerY);
 
   if (squaredDistance > CIRCLE_RADIUS * CIRCLE_RADIUS) {
     return;
   }
 
-  playerMove(row, col);
+  if (paintColor <= NUM_COLORS) {
+    grid[row][col] = paintColor < NUM_COLORS ? String.fromCharCode(paintColor + '0'.charCodeAt(0)) : EMPTY;
+    displayChangesAndSave();
+  } else {
+    playerMove(row, col);
+  }
 }, false);
 
 function loadHistory(position) {
@@ -228,11 +282,29 @@ document.getElementById('forward-button').onclick = function() {
   loadHistory(historyPosition - 1);
 };
 
-for (var r = 1; r <= GRID_SIZE; r++) {
-  for (var c = 1; c <= GRID_SIZE; c++) {
-    var color = Math.floor(Math.random() * NUM_COLORS);
-    grid[r][c] = String.fromCharCode(color + '0'.charCodeAt(0));
+document.getElementById('reset-button').onclick = function() {
+  for (var r = 1; r <= GRID_SIZE; r++) {
+    for (var c = 1; c <= GRID_SIZE; c++) {
+      grid[r][c] = EMPTY;
+    }
   }
-}
 
-displayChangesAndSave();
+  displayChangesAndSave();
+};
+
+document.getElementById('randomize-button').onclick = function() {
+  for (var r = 1; r <= GRID_SIZE; r++) {
+    for (var c = 1; c <= GRID_SIZE; c++) {
+      var color = Math.floor(Math.random() * NUM_COLORS);
+      grid[r][c] = String.fromCharCode(color + '0'.charCodeAt(0));
+    }
+  }
+
+  displayChangesAndSave();
+};
+
+document.getElementById('solve-button').onclick = function() {
+  // TODO
+};
+
+document.getElementById('randomize-button').onclick();
