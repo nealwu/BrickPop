@@ -50,17 +50,17 @@ struct grid_state {
     }
 
     void print() const {
-        putchar('\n');
+        fputc('\n', stderr);
 
         for (int r = 1; r <= GRID_SIZE; r++) {
             for (int c = 1; c <= GRID_SIZE; c++) {
-                putchar(grid[r][c]);
+                fputc(grid[r][c], stderr);
             }
 
-            putchar('\n');
+            fputc('\n', stderr);
         }
 
-        putchar('\n');
+        fputc('\n', stderr);
     }
 
     void slide_down() {
@@ -214,7 +214,7 @@ int main() {
     candidates.push_back(initial_state);
 
     while (!candidates.empty()) {
-        printf("%d candidates\n", (int) candidates.size());
+        fprintf(stderr, "%d candidates\n", (int) candidates.size());
         vector<grid_state> new_candidates;
 
         for (int i = 0; i < (int) candidates.size(); i++) {
@@ -243,9 +243,9 @@ int main() {
         candidates = new_candidates;
     }
 
-    printf("Succeeds: %d\n", winning_state.is_empty());
-    printf("Score: %d\n", winning_state.score);
-    puts("Moves:");
+    fprintf(stderr, "Succeeds: %d\n", winning_state.is_empty());
+    fprintf(stderr, "Score: %d\n", winning_state.score);
+    fputs("Moves:", stderr);
 
     for (int i = 0; i < (int) winning_state.pops.size(); i++) {
         printf("%d %d\n", winning_state.pops[i].first, winning_state.pops[i].second);
