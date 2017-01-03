@@ -10,6 +10,8 @@ var GENERATE_COLORS = 6;
 var COLORS = ['orangered', 'gold', 'seagreen', 'royalblue', 'blueviolet', '#695149'];
 var EMPTY = '.';
 
+var DEMO_DELAY = 250;
+
 var DR = [-1, 0, 1, 0];
 var DC = [0, 1, 0, -1];
 
@@ -191,7 +193,7 @@ function loadHistory(newHistoryPosition, highlightPop) {
 
     visitID++;
     searchAndPop(row, col, grid[row][col], highlight);
-    delay = 1000;
+    delay = DEMO_DELAY;
   }
 
   window.setTimeout(function() {
