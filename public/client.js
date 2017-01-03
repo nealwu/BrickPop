@@ -43,14 +43,11 @@ function copy2D(input) {
 }
 
 function getScore() {
-  var scoreElem = document.getElementById('score');
-  return parseInt(scoreElem.firstChild.nodeValue);
+  return parseInt($('#score').text());
 }
 
 function updateScore(score) {
-  var scoreElem = document.getElementById('score');
-  scoreElem.removeChild(scoreElem.firstChild);
-  scoreElem.appendChild(document.createTextNode(score));
+  $('#score').text(score);
 }
 
 function drawCircle(row, col, color) {
@@ -358,6 +355,7 @@ document.getElementById('randomize-button').onclick = function() {
 document.getElementById('solve-button').onclick = function() {
   historyPosition = 0;
   displayChangesAndSave();
+  $('#status-text').text('Solving...');
   var gridString = '';
 
   for (var r = 1; r <= GRID_SIZE; r++) {
@@ -386,6 +384,8 @@ document.getElementById('solve-button').onclick = function() {
       console.log('Succeeds: ' + isGridEmpty());
       console.log('Score: ' + getScore());
       loadHistory(1);
+
+      $('#status-text').text(isGridEmpty() ? 'Solved!' : 'Failed to finish!');
     }
   });
 };
