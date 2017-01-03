@@ -50,38 +50,40 @@ function updateScore(score) {
   scoreElem.appendChild(document.createTextNode(score));
 }
 
+function drawCircle(row, col, color) {
+  context.beginPath();
+  context.arc(CELL_DIM * (col - 0.5), CELL_DIM * (row - 0.5), CIRCLE_RADIUS, 0, 2 * Math.PI);
+  context.fillStyle = color;
+  context.fill();
+  context.closePath();
+}
+
+function drawSquare(x, y, fillColor) {
+  context.beginPath();
+  context.rect(x, y, CELL_DIM, CELL_DIM);
+  context.fillStyle = fillColor;
+  context.fill();
+  context.lineWidth = 1;
+  context.strokeStyle = 'black';
+  context.stroke();
+  context.closePath();
+}
+
 function updateDisplay(grid) {
   context.clearRect(0, 0, canvas.width, canvas.height);
 
   // Start by drawing out a grid
-  for (var i = 0; i <= GRID_SIZE; i++) {
-    context.lineWidth = 1;
-
-    context.beginPath();
-    context.moveTo(i * CELL_DIM, 0);
-    context.lineTo(i * CELL_DIM, GRID_DIM);
-    context.stroke();
-    context.closePath();
-
-    context.beginPath();
-    context.moveTo(0, i * CELL_DIM);
-    context.lineTo(GRID_DIM, i * CELL_DIM);
-    context.stroke();
-    context.closePath();
+  for (var r = 1; r <= GRID_SIZE; r++) {
+    for (var c = 1; c <= GRID_SIZE; c++) {
+      drawSquare((c - 1) * CELL_DIM, (r - 1) * CELL_DIM, 'white');
+    }
   }
 
   for (var r = 1; r <= GRID_SIZE; r++) {
     for (var c = 1; c <= GRID_SIZE; c++) {
-      if (grid[r][c] === EMPTY) {
-	continue;
+      if (grid[r][c] !== EMPTY) {
+	drawCircle(r, c, COLORS[grid[r][c] - '0']);
       }
-
-      // Draw a colored circle
-      context.beginPath();
-      context.arc(CELL_DIM * (c - 0.5), CELL_DIM * (r - 0.5), CIRCLE_RADIUS, 0, 2 * Math.PI);
-      context.fillStyle = COLORS[grid[r][c] - '0'];
-      context.fill();
-      context.closePath();
     }
   }
 
@@ -89,14 +91,7 @@ function updateDisplay(grid) {
   for (var i = 0; i <= NUM_COLORS + 1; i++) {
     var x = GRID_SIZE * CELL_DIM + PALETTE_GAP;
     var y = i * CELL_DIM;
-    context.beginPath();
-    context.rect(x, y, CELL_DIM, CELL_DIM);
-    context.fillStyle = i < NUM_COLORS ? COLORS[i] : 'white';
-    context.fill();
-    context.lineWidth = 1;
-    context.strokeStyle = 'black';
-    context.stroke();
-    context.closePath();
+    drawSquare(x, y, i < NUM_COLORS ? COLORS[i] : 'white');
 
     if (i === NUM_COLORS + 1) {
       // Draw an X which represents exiting out of the palette
@@ -158,14 +153,40 @@ function printGrid() {
   }
 }
 
-function displayChangesAndSave(shouldSlide) {
-  if (shouldSlide !== false) {
+function displayChangesAndSave(row, col, skipSlide) {
+  if (!skipSlide) {
     slideDown(grid);
   }
 
   updateDisplay(grid);
-  history[historyPosition++] = [copy2D(grid), getScore()];
+  history[historyPosition++] = [copy2D(grid), getScore(), row, col];
   historyLimit = historyPosition;
+}
+
+function loadHistory(newHistoryPosition, highlightPop) {
+  historyPosition = newHistoryPosition;
+  var data = history[historyPosition - 1];
+  var delay = 0;
+
+  if (highlightPop && data[2] && data[3]) {
+    var row = data[2];
+    var col = data[3];
+
+    var highlight = function(row, col) {
+      drawSquare((col - 1) * CELL_DIM, (row - 1) * CELL_DIM, 'black');
+      drawCircle(row, col, COLORS[grid[row][col] - '0']);
+    };
+
+    visitID++;
+    searchAndPop(row, col, grid[row][col], highlight);
+    delay = 1000;
+  }
+
+  window.setTimeout(function() {
+    grid = copy2D(data[0]);
+    updateDisplay(grid);
+    updateScore(data[1]);
+  }, delay);
 }
 
 // Construct arrays
@@ -182,9 +203,9 @@ for (var r = 0; r <= GRID_SIZE + 1; r++) {
   visited.push(visitedRow);
 }
 
-function searchAndPop(row, col, color) {
+function searchAndPop(row, col, color, operation) {
   visited[row][col] = visitID;
-  grid[row][col] = EMPTY;
+  operation(row, col);
 
   var count = 1;
 
@@ -193,7 +214,7 @@ function searchAndPop(row, col, color) {
     var ncol = col + DC[dir];
 
     if (visited[nrow][ncol] !== visitID && grid[nrow][ncol] === color) {
-      count += searchAndPop(nrow, ncol, color);
+      count += searchAndPop(nrow, ncol, color, operation);
     }
   }
 
@@ -209,7 +230,9 @@ function playerMove(row, col) {
 
   visitID++;
   var color = grid[row][col];
-  var popped = searchAndPop(row, col, color);
+  var popped = searchAndPop(row, col, color, function(row, col) {
+    grid[row][col] = EMPTY;
+  });
 
   if (popped === 1) {
     grid[row][col] = color;
@@ -220,7 +243,7 @@ function playerMove(row, col) {
 
   var score = getScore() + popped * (popped - 1);
   updateScore(score);
-  displayChangesAndSave();
+  displayChangesAndSave(row, col);
 }
 
 canvas.addEventListener('click', function(e) {
@@ -246,7 +269,7 @@ canvas.addEventListener('click', function(e) {
 
   if (paintColor <= NUM_COLORS) {
     grid[row][col] = paintColor < NUM_COLORS ? String.fromCharCode(paintColor + '0'.charCodeAt(0)) : EMPTY;
-    displayChangesAndSave(false);
+    displayChangesAndSave(row, col, true);
   } else {
     var centerX = (col - 0.5) * CELL_DIM;
     var centerY = (row - 0.5) * CELL_DIM;
@@ -259,14 +282,6 @@ canvas.addEventListener('click', function(e) {
     playerMove(row, col);
   }
 }, false);
-
-function loadHistory(newHistoryPosition) {
-  historyPosition = newHistoryPosition;
-  var data = history[historyPosition - 1];
-  grid = copy2D(data[0]);
-  updateDisplay(grid);
-  updateScore(data[1]);
-}
 
 document.getElementById('back-button').onclick = function() {
   if (historyPosition <= 1) {
@@ -281,7 +296,7 @@ document.getElementById('forward-button').onclick = function() {
     return;
   }
 
-  loadHistory(historyPosition + 1);
+  loadHistory(historyPosition + 1, true);
 };
 
 document.getElementById('reset-button').onclick = function() {
