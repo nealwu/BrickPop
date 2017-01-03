@@ -6,8 +6,8 @@ var CIRCLE_RADIUS = CELL_DIM * 0.5 * CIRCLE_FRACTION;
 var PALETTE_GAP = 0.5 * CELL_DIM;
 
 var NUM_COLORS = 6;
-var GENERATE_COLORS = 3;
-var COLORS = ['red', 'orange', 'green', 'blue', 'purple', 'saddlebrown'];
+var GENERATE_COLORS = 6;
+var COLORS = ['orangered', 'gold', 'seagreen', 'royalblue', 'blueviolet', '#695149'];
 var EMPTY = '.';
 
 var DR = [-1, 0, 1, 0];
@@ -140,6 +140,18 @@ var historyPosition = 0;
 var historyLimit = 0;
 var visited = [];
 var visitID = 0;
+
+function isGridEmpty() {
+  for (var r = 1; r <= GRID_SIZE; r++) {
+    for (var c = 1; c <= GRID_SIZE; c++) {
+      if (grid[r][c] !== EMPTY) {
+	return false;
+      }
+    }
+  }
+
+  return true;
+}
 
 function printGrid() {
   for (var r = 1; r <= GRID_SIZE; r++) {
@@ -350,6 +362,8 @@ document.getElementById('solve-button').onclick = function() {
 	playerMove(row, col);
       }
 
+      console.log('Succeeds: ' + isGridEmpty());
+      console.log('Score: ' + getScore());
       loadHistory(1);
     }
   });
