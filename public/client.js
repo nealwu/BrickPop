@@ -6,6 +6,7 @@ var CIRCLE_RADIUS = CELL_DIM * 0.5 * CIRCLE_FRACTION;
 var PALETTE_GAP = 0.5 * CELL_DIM;
 
 var NUM_COLORS = 6;
+var GENERATE_COLORS = 3;
 var COLORS = ['red', 'yellow', 'green', 'blue', 'purple', 'saddlebrown'];
 var EMPTY = '.';
 
@@ -157,8 +158,11 @@ function printGrid() {
   }
 }
 
-function displayChangesAndSave() {
-  slideDown(grid);
+function displayChangesAndSave(shouldSlide) {
+  if (shouldSlide !== false) {
+    slideDown(grid);
+  }
+
   updateDisplay(grid);
   history[historyPosition++] = [copy2D(grid), getScore()];
   historyLimit = historyPosition;
@@ -217,7 +221,6 @@ function playerMove(row, col) {
   var score = getScore() + popped * (popped - 1);
   updateScore(score);
   displayChangesAndSave();
-  console.log(history);
 }
 
 canvas.addEventListener('click', function(e) {
@@ -241,24 +244,25 @@ canvas.addEventListener('click', function(e) {
     return;
   }
 
-  var centerX = (col - 0.5) * CELL_DIM;
-  var centerY = (row - 0.5) * CELL_DIM;
-  var squaredDistance = (x - centerX) * (x - centerX) + (y - centerY) * (y - centerY);
-
-  if (squaredDistance > CIRCLE_RADIUS * CIRCLE_RADIUS) {
-    return;
-  }
-
   if (paintColor <= NUM_COLORS) {
     grid[row][col] = paintColor < NUM_COLORS ? String.fromCharCode(paintColor + '0'.charCodeAt(0)) : EMPTY;
-    displayChangesAndSave();
+    displayChangesAndSave(false);
   } else {
+    var centerX = (col - 0.5) * CELL_DIM;
+    var centerY = (row - 0.5) * CELL_DIM;
+    var squaredDistance = (x - centerX) * (x - centerX) + (y - centerY) * (y - centerY);
+
+    if (squaredDistance > CIRCLE_RADIUS * CIRCLE_RADIUS) {
+      return;
+    }
+
     playerMove(row, col);
   }
 }, false);
 
-function loadHistory(position) {
-  var data = history[position];
+function loadHistory(newHistoryPosition) {
+  historyPosition = newHistoryPosition;
+  var data = history[historyPosition - 1];
   grid = copy2D(data[0]);
   updateDisplay(grid);
   updateScore(data[1]);
@@ -269,7 +273,6 @@ document.getElementById('back-button').onclick = function() {
     return;
   }
 
-  historyPosition--;
   loadHistory(historyPosition - 1);
 };
 
@@ -278,8 +281,7 @@ document.getElementById('forward-button').onclick = function() {
     return;
   }
 
-  historyPosition++;
-  loadHistory(historyPosition - 1);
+  loadHistory(historyPosition + 1);
 };
 
 document.getElementById('reset-button').onclick = function() {
@@ -295,7 +297,7 @@ document.getElementById('reset-button').onclick = function() {
 document.getElementById('randomize-button').onclick = function() {
   for (var r = 1; r <= GRID_SIZE; r++) {
     for (var c = 1; c <= GRID_SIZE; c++) {
-      var color = Math.floor(Math.random() * NUM_COLORS);
+      var color = Math.floor(Math.random() * GENERATE_COLORS);
       grid[r][c] = String.fromCharCode(color + '0'.charCodeAt(0));
     }
   }
@@ -304,7 +306,36 @@ document.getElementById('randomize-button').onclick = function() {
 };
 
 document.getElementById('solve-button').onclick = function() {
-  // TODO
+  historyPosition = 0;
+  displayChangesAndSave();
+  var gridString = '';
+
+  for (var r = 1; r <= GRID_SIZE; r++) {
+    for (var c = 1; c <= GRID_SIZE; c++) {
+      gridString += grid[r][c];
+    }
+  }
+
+  $.ajax({
+    url: '/solve',
+    data: {
+      gridString: gridString
+    },
+    success: function(result) {
+      var moves = result.split(/\s+/);
+      var numMoves = Math.floor(moves.length / 2);
+
+      console.log(moves);
+
+      for (var i = 0; i < numMoves; i++) {
+	var row = parseInt(moves[2 * i]);
+	var col = parseInt(moves[2 * i + 1]);
+	playerMove(row, col);
+      }
+
+      loadHistory(1);
+    }
+  });
 };
 
 document.getElementById('randomize-button').onclick();

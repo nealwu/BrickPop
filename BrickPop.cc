@@ -245,7 +245,7 @@ int main() {
 
     fprintf(stderr, "Succeeds: %d\n", winning_state.is_empty());
     fprintf(stderr, "Score: %d\n", winning_state.score);
-    fputs("Moves:", stderr);
+    fprintf(stderr, "Moves:\n");
 
     for (int i = 0; i < (int) winning_state.pops.size(); i++) {
         printf("%d %d\n", winning_state.pops[i].first, winning_state.pops[i].second);
