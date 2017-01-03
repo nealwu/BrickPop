@@ -387,7 +387,7 @@ document.getElementById('solve-button').onclick = function() {
       console.log('Score: ' + getScore());
       loadHistory(1);
 
-      $('#status-text').text(isGridEmpty() ? 'Solved!' : 'Failed to finish!');
+      $('#status-text').text(isGridEmpty() ? 'Succeeded!' : 'Failed to finish!');
     }
   });
 };
