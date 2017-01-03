@@ -338,6 +338,7 @@ document.getElementById('reset-button').onclick = function() {
 
   updateScore(0);
   displayChangesAndSave();
+  $('#status-text').text('');
 };
 
 document.getElementById('randomize-button').onclick = function() {
@@ -350,6 +351,7 @@ document.getElementById('randomize-button').onclick = function() {
 
   updateScore(0);
   displayChangesAndSave();
+  $('#status-text').text('');
 };
 
 document.getElementById('solve-button').onclick = function() {
