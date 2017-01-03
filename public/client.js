@@ -306,6 +306,7 @@ document.getElementById('reset-button').onclick = function() {
     }
   }
 
+  updateScore(0);
   displayChangesAndSave();
 };
 
@@ -317,6 +318,7 @@ document.getElementById('randomize-button').onclick = function() {
     }
   }
 
+  updateScore(0);
   displayChangesAndSave();
 };
 
