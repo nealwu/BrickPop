@@ -19,6 +19,7 @@ var canvas = document.querySelector('canvas');
 var context = canvas.getContext('2d');
 
 var paintColor = NUM_COLORS + 1;
+var isMouseDown = false;
 
 // Set up an extra column for the painting palette
 canvas.width = (GRID_SIZE + 1) * CELL_DIM + PALETTE_GAP;
@@ -260,10 +261,10 @@ function playerMove(row, col) {
   displayChangesAndSave(row, col);
 }
 
-canvas.addEventListener('click', function(e) {
+function handleMouse(event, isClick) {
   var rect = canvas.getBoundingClientRect();
-  var x = e.pageX - rect.left;
-  var y = e.pageY - rect.top;
+  var x = event.pageX - rect.left;
+  var y = event.pageY - rect.top;
 
   var row = Math.floor(y / CELL_DIM) + 1;
   var col = Math.floor(x / CELL_DIM) + 1;
@@ -284,7 +285,7 @@ canvas.addEventListener('click', function(e) {
   if (paintColor <= NUM_COLORS) {
     grid[row][col] = paintColor < NUM_COLORS ? String.fromCharCode(paintColor + '0'.charCodeAt(0)) : EMPTY;
     displayChangesAndSave(row, col, true);
-  } else {
+  } else if (isClick) {
     var centerX = (col - 0.5) * CELL_DIM;
     var centerY = (row - 0.5) * CELL_DIM;
     var squaredDistance = (x - centerX) * (x - centerX) + (y - centerY) * (y - centerY);
@@ -295,7 +296,24 @@ canvas.addEventListener('click', function(e) {
 
     playerMove(row, col);
   }
-}, false);
+}
+
+canvas.addEventListener('mousedown', function() {
+  isMouseDown = true;
+});
+
+canvas.addEventListener('mouseup', function(event) {
+  isMouseDown = false;
+  handleMouse(event, true);
+});
+
+canvas.addEventListener('mousemove', function(event) {
+  if (!isMouseDown) {
+    return;
+  }
+
+  handleMouse(event, false);
+});
 
 document.getElementById('back-button').onclick = function() {
   if (historyPosition <= 1) {
