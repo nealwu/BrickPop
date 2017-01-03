@@ -8,7 +8,7 @@
 using namespace std;
 
 const int GRID_ARRAY_SIZE = 12;
-const int NUM_CANDIDATES = 10000;
+const int NUM_CANDIDATES = 5000;
 
 const int DR[] = {-1, 0, 1, 0};
 const int DC[] = {0, 1, 0, -1};
