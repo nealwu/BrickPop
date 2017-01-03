@@ -298,8 +298,9 @@ function handleMouse(event, isClick) {
   }
 }
 
-canvas.addEventListener('mousedown', function() {
+canvas.addEventListener('mousedown', function(event) {
   isMouseDown = true;
+  event.preventDefault();
 });
 
 canvas.addEventListener('mouseup', function(event) {
