@@ -7,7 +7,7 @@ var PALETTE_GAP = 0.5 * CELL_DIM;
 
 var NUM_COLORS = 6;
 var GENERATE_COLORS = 3;
-var COLORS = ['red', 'yellow', 'green', 'blue', 'purple', 'saddlebrown'];
+var COLORS = ['red', 'orange', 'green', 'blue', 'purple', 'saddlebrown'];
 var EMPTY = '.';
 
 var DR = [-1, 0, 1, 0];
