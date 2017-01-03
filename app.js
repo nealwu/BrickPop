@@ -36,6 +36,7 @@ app.get('/solve', function(req, res) {
       exec('./BrickPop < input.txt', function(err, stdout, stderr) {
 	if (err) throw err;
 	console.log(stderr);
+	console.log(stdout);
 	res.write(stdout);
 	res.end();
       });
