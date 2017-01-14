@@ -366,6 +366,8 @@ document.getElementById('solve-button').onclick = function() {
     }
   }
 
+  console.log('gridString: ' + gridString);
+
   $.ajax({
     url: '/solve',
     data: {

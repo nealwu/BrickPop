@@ -13,6 +13,7 @@ var server = app.listen(app.get('port'), function() {
 });
 
 app.get('/', function(req, res) {
+  res.setHeader('Content-Type', 'application/html');
   res.sendfile('public/index.html');
 });
 
@@ -37,6 +38,7 @@ app.get('/solve', function(req, res) {
 	if (err) throw err;
 	console.log(stderr);
 	console.log(stdout);
+	res.setHeader('Access-Control-Allow-Origin', '*');
 	res.write(stdout);
 	res.end();
       });
