@@ -62,7 +62,7 @@ function readGrid() {
       var rgb = rgbToNumber(getGridRGB(row, col));
 
       if (!(rgb in rgbToChar)) {
-	rgbToChar[rgb] = counter++;
+        rgbToChar[rgb] = counter++;
       }
 
       grid += rgbToChar[rgb];
@@ -101,8 +101,8 @@ function solve() {
 
     var nextMove = function() {
       if (index >= numMoves) {
-	window.setTimeout(solve, GAME_GAP);
-	return;
+        window.setTimeout(solve, GAME_GAP);
+        return;
       }
 
       var row = parseInt(moves[2 * index]);
