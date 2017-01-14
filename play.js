@@ -1,9 +1,13 @@
 var GRID_SIZE = 10;
 var EMPTY = '.';
 
+var CLICK_GAP = 1500;
+var GAME_GAP = 7000;
+
 var canvas = null;
 var context = null;
 var pixels = null;
+var stop = false;
 
 function rgbToNumber(rgb) {
   return (rgb[0] * 256 + rgb[1]) * 256 + rgb[2];
@@ -77,7 +81,11 @@ function load(url, callback) {
   xhr.send();
 }
 
-function main() {
+function solve() {
+  if (stop) {
+    return;
+  }
+
   console.log('Starting solver...');
   canvas = document.querySelector('canvas');
   context = canvas.getContext('2d');
@@ -93,7 +101,7 @@ function main() {
 
     var nextMove = function() {
       if (index >= numMoves) {
-	window.setTimeout(main, 10000);
+	window.setTimeout(solve, GAME_GAP);
 	return;
       }
 
@@ -102,7 +110,7 @@ function main() {
       console.log(row + ' ' + col);
       clickGrid(row, col);
       index++;
-      window.setTimeout(nextMove, 1500);
+      window.setTimeout(nextMove, CLICK_GAP);
     };
 
     nextMove();
