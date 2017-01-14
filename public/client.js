@@ -7,7 +7,7 @@ var PALETTE_GAP = 0.5 * CELL_DIM;
 
 var NUM_COLORS = 6;
 var GENERATE_COLORS = 6;
-var COLORS = ['orangered', 'gold', 'seagreen', 'royalblue', 'blueviolet', '#695149'];
+var COLORS = ['#FF2800', 'gold', 'seagreen', 'royalblue', 'blueviolet', '#695149'];
 var EMPTY = '.';
 
 var DEMO_DELAY = 250;
