@@ -78,6 +78,7 @@ function load(url, callback) {
 }
 
 function main() {
+  console.log('Starting solver...');
   canvas = document.querySelector('canvas');
   context = canvas.getContext('2d');
 
