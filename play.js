@@ -107,7 +107,6 @@ function solve() {
 
       var row = parseInt(moves[2 * index]);
       var col = parseInt(moves[2 * index + 1]);
-      console.log(row + ' ' + col);
       clickGrid(row, col);
       index++;
       window.setTimeout(nextMove, CLICK_GAP);
