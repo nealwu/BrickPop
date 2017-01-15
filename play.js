@@ -1,11 +1,11 @@
 var GRID_SIZE = 10;
 var EMPTY = '.';
 
-var CLICK_GAP = 1300;
+var CLICK_GAP = 1400;
 var FINISH_GAP = 1000;
 var GAME_GAP = 2000;
 
-var MULTICLICK_DELAY = 250;
+var MULTICLICK_DELAY = 300;
 var MULTICLICK_REPEAT = 2;
 
 var game = null;
@@ -90,7 +90,7 @@ function readGrid() {
 
 function load(url, callback) {
   var xhr = new XMLHttpRequest();
-  xhr.onload = function () {
+  xhr.onload = function() {
     callback(xhr.response);
   };
   xhr.open('GET', url);
@@ -99,6 +99,7 @@ function load(url, callback) {
 
 function solve() {
   if (stop) {
+    console.log('Stopping');
     return;
   }
 
@@ -118,7 +119,7 @@ function solve() {
     var nextMove = function() {
       if (index >= numMoves) {
         window.setTimeout(function() {
-          click(game.clientWidth / 2, game.clientHeight / 2);
+          click(0, 0);
           window.setTimeout(solve, GAME_GAP);
         }, FINISH_GAP);
         return;
