@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cassert>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -9,6 +10,7 @@ using namespace std;
 
 const int GRID_ARRAY_SIZE = 12;
 const int NUM_CANDIDATES = 5000;
+const int INF = 1000000005;
 
 const int DR[] = {-1, 0, 1, 0};
 const int DC[] = {0, 1, 0, -1};
@@ -193,22 +195,26 @@ struct grid_state {
     bool operator<(grid_state &other) {
         return heuristic() > other.heuristic();
     }
+
+    pair<bool, double> winner_metric() {
+        return make_pair(is_empty(), (double) score / (pops.size() + 10));
+    }
 };
 
 int main() {
     int _seed; srand(time(NULL) * (long long) &_seed);
-    scanf("%d %d", &GRID_SIZE, &NUM_COLORS);
+    assert(scanf("%d %d", &GRID_SIZE, &NUM_COLORS) == 2);
     grid_state initial_state;
     initial_state.score = 0;
     memset(initial_state.grid, EMPTY, sizeof(initial_state.grid));
 
     for (int r = 1; r <= GRID_SIZE; r++) {
-        scanf("%s", initial_state.grid[r] + 1);
+        assert(scanf("%s", initial_state.grid[r] + 1) == 1);
     }
 
     grid_state winning_state;
     winning_state.grid[GRID_SIZE][1] = '0';
-    winning_state.score = 0;
+    winning_state.score = INF;
 
     vector<grid_state> candidates;
     candidates.push_back(initial_state);
@@ -224,8 +230,7 @@ int main() {
                 continue;
             }
 
-            if (make_pair(candidate.is_empty(), candidate.score) >
-                make_pair(winning_state.is_empty(), winning_state.score)) {
+            if (candidate.winner_metric() > winning_state.winner_metric()) {
                 winning_state = candidate;
             }
 
@@ -245,7 +250,7 @@ int main() {
 
     fprintf(stderr, "Succeeds: %d\n", winning_state.is_empty());
     fprintf(stderr, "Score: %d\n", winning_state.score);
-    fprintf(stderr, "Moves:\n");
+    fprintf(stderr, "Moves: %d\n", (int) winning_state.pops.size());
 
     for (int i = 0; i < (int) winning_state.pops.size(); i++) {
         printf("%d %d\n", winning_state.pops[i].first, winning_state.pops[i].second);
