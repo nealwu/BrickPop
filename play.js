@@ -1,8 +1,11 @@
 var GRID_SIZE = 10;
 var EMPTY = '.';
 
-var CLICK_GAP = 2000;
+var CLICK_GAP = 1500;
 var GAME_GAP = 7000;
+
+var MULTICLICK_DELAY = 250;
+var MULTICLICK_REPEAT = 2;
 
 var canvas = null;
 var context = null;
@@ -48,6 +51,18 @@ function getGridRGB(row, col) {
 
 function clickGrid(row, col) {
   return click(colToX(col, true), rowToY(row, true));
+}
+
+function multicall(func, delay, repeat) {
+  if (repeat < 0) {
+    return;
+  }
+
+  func();
+
+  window.setTimeout(function() {
+    multicall(func, delay, repeat - 1);
+  }, delay);
 }
 
 function readGrid() {
@@ -107,7 +122,11 @@ function solve() {
 
       var row = parseInt(moves[2 * index]);
       var col = parseInt(moves[2 * index + 1]);
-      clickGrid(row, col);
+
+      multicall(function() {
+	clickGrid(row, col);
+      }, MULTICLICK_DELAY, MULTICLICK_REPEAT);
+
       index++;
       window.setTimeout(nextMove, CLICK_GAP);
     };
