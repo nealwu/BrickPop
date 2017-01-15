@@ -108,7 +108,7 @@ function solve() {
 
   pixels = context.getImageData(0, 0, game.width, game.height).data;
 
-  load('https://dcpos.ch/brickpop/solve?gridString=' + readGrid(), function(result) {
+  load('https://localhost:8001/solve?gridString=' + readGrid(), function(result) {
     var moves = result.split(/\s+/);
     var numMoves = Math.floor(moves.length / 2);
 

@@ -2,4 +2,8 @@ BrickPop
 GenerateGrid
 input.txt
 node_modules
+server.crt
+server.csr
+server.key
+server.key.secure
 *~

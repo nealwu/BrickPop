@@ -2,15 +2,24 @@ var NUM_COLORS = 6;
 
 var express = require('express');
 var fs = require('fs');
+var http = require('http');
+var https = require('https');
+
 var exec = require('child_process').exec;
 
 var app = express();
-app.set('port', 8000);
 app.use(express.static('public'));
 
-var server = app.listen(app.get('port'), function() {
-  console.log('Listening on port ' + server.address().port);
-});
+var credentials = {
+  key: fs.readFileSync('server.key'),
+  cert: fs.readFileSync('server.crt')
+};
+
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
+
+httpServer.listen(8000);
+httpsServer.listen(8001);
 
 app.get('/', function(req, res) {
   res.setHeader('Content-Type', 'application/html');
