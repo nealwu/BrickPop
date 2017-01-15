@@ -73,8 +73,8 @@ function readGrid() {
   rgbToChar[backgroundRGB] = EMPTY;
   var counter = 0;
 
-  for (var row = 1; row <= 10; row++) {
-    for (var col = 1; col <= 10; col++) {
+  for (var row = 1; row <= GRID_SIZE; row++) {
+    for (var col = 1; col <= GRID_SIZE; col++) {
       var rgb = rgbToNumber(getGridRGB(row, col));
 
       if (!(rgb in rgbToChar)) {
