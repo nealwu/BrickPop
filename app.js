@@ -43,7 +43,7 @@ app.get('/solve', function(req, res) {
     fs.writeFile('input.txt', gridStringWithNewlines, function(err) {
       if (err) throw err;
 
-      exec('./BrickPop < input.txt', function(err, stdout, stderr) {
+      exec('time -p ./BrickPop < input.txt', function(err, stdout, stderr) {
 	if (err) throw err;
 	console.log(stderr);
 	console.log(stdout);

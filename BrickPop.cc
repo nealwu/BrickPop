@@ -196,8 +196,8 @@ struct grid_state {
         return heuristic() > other.heuristic();
     }
 
-    pair<bool, double> winner_metric() {
-        return make_pair(is_empty(), (double) score / (pops.size() + 10));
+    pair<bool, int> winner_metric() {
+        return make_pair(is_empty(), score);
     }
 };
 
