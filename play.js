@@ -7,7 +7,7 @@ var GAME_GAP = 7000;
 var MULTICLICK_DELAY = 250;
 var MULTICLICK_REPEAT = 2;
 
-var canvas = null;
+var game = null;
 var context = null;
 var pixels = null;
 var stop = false;
@@ -19,7 +19,7 @@ function rgbToNumber(rgb) {
 function getRGB(x, y) {
   x = Math.round(x);
   y = Math.round(y);
-  var start = (y * canvas.width + x) * 4;
+  var start = (y * game.width + x) * 4;
   return pixels.slice(start, start + 3);
 }
 
@@ -29,19 +29,19 @@ function click(x, y) {
   var mousedown = new MouseEvent('mousedown', {clientX: x, clientY: y});
   var mouseup = new MouseEvent('mouseup', {clientX: x, clientY: y});
   var click = new MouseEvent('click', {clientX: x, clientY: y});
-  canvas.dispatchEvent(mousedown);
-  canvas.dispatchEvent(mouseup);
-  canvas.dispatchEvent(click);
+  game.dispatchEvent(mousedown);
+  game.dispatchEvent(mouseup);
+  game.dispatchEvent(click);
 }
 
 function rowToY(row, useClientDim) {
-  var width = useClientDim ? canvas.clientWidth : canvas.width;
-  var height = useClientDim ? canvas.clientHeight : canvas.height;
+  var width = useClientDim ? game.clientWidth : game.width;
+  var height = useClientDim ? game.clientHeight : game.height;
   return height / 2 + (row - (GRID_SIZE / 2 + 0.5)) * width / GRID_SIZE;
 }
 
 function colToX(col, useClientDim) {
-  var width = useClientDim ? canvas.clientWidth : canvas.width;
+  var width = useClientDim ? game.clientWidth : game.width;
   return width / 2 + (col - (GRID_SIZE / 2 + 0.5)) * width / GRID_SIZE;
 }
 
@@ -102,10 +102,10 @@ function solve() {
   }
 
   console.log('Starting solver...');
-  canvas = document.querySelector('canvas');
-  context = canvas.getContext('2d');
+  game = document.querySelector('canvas');
+  context = game.getContext('2d');
 
-  pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+  pixels = context.getImageData(0, 0, game.width, game.height).data;
 
   load('https://dcpos.ch/brickpop/solve?gridString=' + readGrid(), function(result) {
     var moves = result.split(/\s+/);
