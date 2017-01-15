@@ -1,7 +1,7 @@
 var GRID_SIZE = 10;
 var EMPTY = '.';
 
-var CLICK_GAP = 1600;
+var CLICK_GAP = 2000;
 var GAME_GAP = 7000;
 
 var canvas = null;
