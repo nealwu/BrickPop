@@ -2,7 +2,8 @@ var GRID_SIZE = 10;
 var EMPTY = '.';
 
 var CLICK_GAP = 1500;
-var GAME_GAP = 7000;
+var FINISH_GAP = 1000;
+var GAME_GAP = 2000;
 
 var MULTICLICK_DELAY = 250;
 var MULTICLICK_REPEAT = 2;
@@ -116,7 +117,10 @@ function solve() {
 
     var nextMove = function() {
       if (index >= numMoves) {
-        window.setTimeout(solve, GAME_GAP);
+        window.setTimeout(function() {
+          click(game.clientWidth / 2, game.clientHeight / 2);
+          window.setTimeout(solve, GAME_GAP);
+        }, FINISH_GAP);
         return;
       }
 
@@ -124,7 +128,7 @@ function solve() {
       var col = parseInt(moves[2 * index + 1]);
 
       multicall(function() {
-	clickGrid(row, col);
+        clickGrid(row, col);
       }, MULTICLICK_DELAY, MULTICLICK_REPEAT);
 
       index++;
