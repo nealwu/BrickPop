@@ -3,7 +3,7 @@ var EMPTY = '.';
 
 var CLICK_GAP = 1400;
 var FINISH_GAP = 1000;
-var GAME_GAP = 2000;
+var GAME_GAP = 2500;
 
 var MULTICLICK_DELAY = 300;
 var MULTICLICK_REPEAT = 2;
