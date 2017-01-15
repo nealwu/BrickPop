@@ -9,8 +9,9 @@
 using namespace std;
 
 const int GRID_ARRAY_SIZE = 12;
-const int NUM_CANDIDATES = 5000;
 const int INF = 1000000005;
+
+const int CANDIDATE_LIMITS[] = {1000, 5000, 20000, 100000};
 
 const int DR[] = {-1, 0, 1, 0};
 const int DC[] = {0, 1, 0, -1};
@@ -189,7 +190,7 @@ struct grid_state {
         }
 
         int estimated_score = score + estimated_score_to_finish();
-        return -10000.0 * singletons + estimated_score;
+        return -10000 * singletons + estimated_score;
     }
 
     bool operator<(grid_state &other) {
@@ -201,16 +202,8 @@ struct grid_state {
     }
 };
 
-int main() {
-    int _seed; srand(time(NULL) * (long long) &_seed);
-    assert(scanf("%d %d", &GRID_SIZE, &NUM_COLORS) == 2);
-    grid_state initial_state;
-    initial_state.score = 0;
-    memset(initial_state.grid, EMPTY, sizeof(initial_state.grid));
-
-    for (int r = 1; r <= GRID_SIZE; r++) {
-        assert(scanf("%s", initial_state.grid[r] + 1) == 1);
-    }
+grid_state solve(const grid_state &initial_state, int candidate_limit) {
+    hashes.clear();
 
     grid_state winning_state;
     winning_state.grid[GRID_SIZE][1] = '0';
@@ -238,19 +231,47 @@ int main() {
             new_candidates.insert(new_candidates.end(), neighbors.begin(), neighbors.end());
         }
 
-        if ((int) new_candidates.size() > NUM_CANDIDATES) {
+        if ((int) new_candidates.size() > candidate_limit) {
             nth_element(new_candidates.begin(),
-                new_candidates.begin() + NUM_CANDIDATES,
+                new_candidates.begin() + candidate_limit,
                 new_candidates.end());
-            new_candidates.resize(NUM_CANDIDATES);
+            new_candidates.resize(candidate_limit);
         }
 
         candidates = new_candidates;
     }
 
-    fprintf(stderr, "Succeeds: %d\n", winning_state.is_empty());
+    return winning_state;
+}
+
+int main() {
+    int _seed; srand(time(NULL) * (long long) &_seed);
+    assert(scanf("%d %d", &GRID_SIZE, &NUM_COLORS) == 2);
+
+    grid_state initial_state;
+    initial_state.score = 0;
+    memset(initial_state.grid, EMPTY, sizeof(initial_state.grid));
+
+    for (int r = 1; r <= GRID_SIZE; r++) {
+        assert(scanf("%s", initial_state.grid[r] + 1) == 1);
+    }
+
+    grid_state winning_state;
+
+    for (int i = 0; i < sizeof(CANDIDATE_LIMITS) / sizeof(CANDIDATE_LIMITS[0]); i++) {
+        winning_state = solve(initial_state, CANDIDATE_LIMITS[i]);
+        fprintf(stderr, "Succeeds: %d\n", winning_state.is_empty());
+
+        if (winning_state.is_empty()) {
+            break;
+        }
+
+        fprintf(stderr, "\n");
+    }
+
     fprintf(stderr, "Score: %d\n", winning_state.score);
     fprintf(stderr, "Moves: %d\n", (int) winning_state.pops.size());
+    fprintf(stderr, "\n");
 
     for (int i = 0; i < (int) winning_state.pops.size(); i++) {
         printf("%d %d\n", winning_state.pops[i].first, winning_state.pops[i].second);
