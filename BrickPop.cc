@@ -1,7 +1,6 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <map>
@@ -245,7 +244,6 @@ grid_state solve(const grid_state &initial_state, int candidate_limit) {
 }
 
 int main() {
-    int _seed; srand(time(NULL) * (long long) &_seed);
     assert(scanf("%d %d", &GRID_SIZE, &NUM_COLORS) == 2);
 
     grid_state initial_state;
