@@ -11,6 +11,6 @@ First, run your server:
 $ npm start
 ```
 
-Open Chrome and start playing the BrickPop game (make sure to click "Play Now"). Open the console, select the dropdown, and choose "index.html". Now you can paste in the code from `play.js` into your console. Run `solve()` to start the solver, and run `stop()` when you would like it to stop after finishing the current level. Happy brick popping!
+Open Chrome and start playing the BrickPop game (make sure to click "Play Now"). Open the console, select the dropdown, and choose "index.html". Now you can paste in the code from `play.js` into your console. Run `solve()` to start the solver, and run `stop = true` when you would like it to stop after finishing the current level. Happy brick popping!
 
 ![Brick Pop](BrickPop.png)
