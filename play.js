@@ -97,11 +97,13 @@ function load(url, callback) {
   xhr.send();
 }
 
-function solve() {
-  if (stop) {
+function solve(repeat) {
+  if (stop && repeat) {
     console.log('Stopping');
     return;
   }
+
+  stop = false;
 
   console.log('Starting solver...');
   game = document.querySelector('canvas');
@@ -120,7 +122,7 @@ function solve() {
       if (index >= numMoves) {
         window.setTimeout(function() {
           click(0, 0);
-          window.setTimeout(solve, GAME_GAP);
+          window.setTimeout(solve, GAME_GAP, true);
         }, FINISH_GAP);
         return;
       }
