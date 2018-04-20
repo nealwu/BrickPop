@@ -82,7 +82,7 @@ function updateDisplay(grid) {
   for (var r = 1; r <= GRID_SIZE; r++) {
     for (var c = 1; c <= GRID_SIZE; c++) {
       if (grid[r][c] !== EMPTY) {
-	drawCircle(r, c, COLORS[grid[r][c] - '0']);
+        drawCircle(r, c, COLORS[grid[r][c] - '0']);
       }
     }
   }
@@ -145,7 +145,7 @@ function isGridEmpty() {
   for (var r = 1; r <= GRID_SIZE; r++) {
     for (var c = 1; c <= GRID_SIZE; c++) {
       if (grid[r][c] !== EMPTY) {
-	return false;
+        return false;
       }
     }
   }
@@ -272,7 +272,7 @@ function handleMouse(event, isClick) {
       var index = row - 1;
 
       if (index <= NUM_COLORS + 1) {
-	paintColor = index;
+        paintColor = index;
       }
     }
 
@@ -380,9 +380,9 @@ document.getElementById('solve-button').onclick = function() {
       console.log(moves);
 
       for (var i = 0; i < numMoves; i++) {
-	var row = parseInt(moves[2 * i]);
-	var col = parseInt(moves[2 * i + 1]);
-	playerMove(row, col);
+        var row = parseInt(moves[2 * i]);
+        var col = parseInt(moves[2 * i + 1]);
+        playerMove(row, col);
       }
 
       console.log('Succeeds: ' + isGridEmpty());
